@@ -1,6 +1,6 @@
 import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserSignUpDto, UserSignInDto, UserScoreDto, UserStageDto } from './user.dto'
+import { UserSignUpDto, UserSignInDto, UserStageScoreDto, UserStageDto } from './user.dto'
 
 @Controller('user')
 export class UserController {
@@ -18,9 +18,9 @@ export class UserController {
     return this.userService.signInUser(dto);
   }
 
-  @Post("/score")
+  @Post("/stage/score")
   @UsePipes(new ValidationPipe())
-  async totalScoreUser(@Body() dto:UserStageDto) {
-    return this.userService.userTotalScore(dto);
+  async stageScoreUser(@Body() dto:UserStageScoreDto) {
+    return this.userService.stageScoreUser(dto);
   }
 }

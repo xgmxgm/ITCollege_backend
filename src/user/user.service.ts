@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserSignUpDto, UserSignInDto, UserScoreDto, UserStageDto } from './user.dto'
+import { UserSignUpDto, UserSignInDto, UserStageScoreDto, UserStageDto } from './user.dto'
 import { Prisma, PrismaClient } from '@prisma/client'
 import * as bcrypt from "bcrypt"
 
@@ -41,6 +41,13 @@ export class UserService {
 			const findUser = await prisma.user.findFirst({
 				where: {
 					email: dto.Email
+				},
+				include: {
+					stages: {
+						include: {
+							referees: true
+						}
+					}
 				}
 			})
 
@@ -60,7 +67,7 @@ export class UserService {
 
 			const {passwordHash, ...User} = findUser;
 
-			return User
+			return {User}
 		} catch(err) {
 			console.log(err)
 
@@ -68,61 +75,42 @@ export class UserService {
 		}
 	}
 
-	async userTotalScore(dto: UserScoreDto) {
+	async stageScoreUser(dto: UserStageScoreDto) {
 		try {
-			const FindUser = await prisma.user.findFirst({
+			const FindStudent = await prisma.user.findFirst({
 				where: {
-					id: dto.Id
+					id: dto.StudentId
 				}
 			})
 
-			const User = await prisma.user.update({
+			const FindReferee = await prisma.user.findFirst({
 				where: {
-					id: dto.Id,
+					id: dto.RefereeId
+				}
+			})
+
+			const Student = await prisma.user.update({
+				where: {
+					id: dto.StudentId,
 				},
 				data: {
-					totalScore: FindUser.totalScore + dto.Score
+					stages: {
+						create: {
+							stageName: dto.StageName,
+							referees: {
+								create: {
+									refereeName: FindReferee.fullName,
+									score: dto.Score
+								}
+							}
+						}
+					},
 				}
 			})
+
+			const {passwordHash, ...User} = Student;
 
 			return User
-		} catch(err) {
-			console.error(err)
-
-			throw new BadRequestException("Ошибка оценкий !")
-		}
-	}
-
-	async userIntroducingYourself(dto: UserStageDto) {
-		try {
-			const FindUser = await prisma.user.findFirst({
-				where: {
-					id: dto.Id
-				}
-			})
-
-			const Stage = await prisma.introducingYourself.create({
-				data: {
-					refereeScore_1: dto.refereeScore_1,
-					refereeScore_2: dto.refereeScore_2,
-					refereeScore_3: dto.refereeScore_3,
-					refereeScore_4: dto.refereeScore_4,
-					studentId: dto.Id
-				}
-			})
-
-			// const User = await prisma.user.update({
-			// 	where: {
-			// 		id: dto.Id,
-			// 	},
-			// 	data: {
-			// 		IntroducingYourselfScores: {
-			// 			update: {
-
-			// 			}
-			// 		}
-			// 	}
-			// })
 		} catch(err) {
 			console.error(err)
 

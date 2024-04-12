@@ -21,15 +21,21 @@ model User {
   avatarURL    String? @default("avatar.png")
   role         String
   totalScore   Int     @default(0)
-  IntroducingYourselfScores IntroducingYourself?
+  stages       Stage[]
 }
 
-model IntroducingYourself {
-  id             Int    @default(autoincrement()) @id
-  refereeScore_1 Int    @default(0)
-  refereeScore_2 Int    @default(0)
-  refereeScore_3 Int    @default(0)
-  refereeScore_4 Int    @default(0)
-  student        User   @relation(fields: [studentId], references: [id])
-  studentId      Int    @unique
+model Stage {
+  id        Int @default(autoincrement()) @id
+  stageName String
+  referees  RefereeScore[]
+  user      User @relation(fields: [userId], references: [id])
+  userId    Int @unique
+}
+
+model RefereeScore {
+  id          Int @default(autoincrement()) @id
+  refereeName String
+  score       Int @default(0)
+  user        Stage @relation(fields: [userId], references: [id])
+  userId      Int @unique
 }

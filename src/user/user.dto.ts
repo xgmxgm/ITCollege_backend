@@ -26,9 +26,15 @@ export class UserSignInDto {
 	Password: string;
 }
 
-export class UserScoreDto {
+export class UserStageScoreDto {
+	@IsString()
+	StageName: string;
+
 	@IsNumber()
-	Id: number;
+	StudentId: number;
+
+	@IsNumber()
+	RefereeId: number;
 
 	@IsNumber()
 	Score: number;
