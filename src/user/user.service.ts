@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserSignUpDto, UserSignInDto } from './user.dto'
+import { UserSignUpDto, UserSignInDto, UserScoreDto, UserStageDto } from './user.dto'
 import { Prisma, PrismaClient } from '@prisma/client'
 import * as bcrypt from "bcrypt"
 
@@ -65,6 +65,68 @@ export class UserService {
 			console.log(err)
 
 			throw new BadRequestException("Авторизация прошла неудачно !")
+		}
+	}
+
+	async userTotalScore(dto: UserScoreDto) {
+		try {
+			const FindUser = await prisma.user.findFirst({
+				where: {
+					id: dto.Id
+				}
+			})
+
+			const User = await prisma.user.update({
+				where: {
+					id: dto.Id,
+				},
+				data: {
+					totalScore: FindUser.totalScore + dto.Score
+				}
+			})
+
+			return User
+		} catch(err) {
+			console.error(err)
+
+			throw new BadRequestException("Ошибка оценкий !")
+		}
+	}
+
+	async userIntroducingYourself(dto: UserStageDto) {
+		try {
+			const FindUser = await prisma.user.findFirst({
+				where: {
+					id: dto.Id
+				}
+			})
+
+			const Stage = await prisma.introducingYourself.create({
+				data: {
+					refereeScore_1: dto.refereeScore_1,
+					refereeScore_2: dto.refereeScore_2,
+					refereeScore_3: dto.refereeScore_3,
+					refereeScore_4: dto.refereeScore_4,
+					studentId: dto.Id
+				}
+			})
+
+			// const User = await prisma.user.update({
+			// 	where: {
+			// 		id: dto.Id,
+			// 	},
+			// 	data: {
+			// 		IntroducingYourselfScores: {
+			// 			update: {
+
+			// 			}
+			// 		}
+			// 	}
+			// })
+		} catch(err) {
+			console.error(err)
+
+			throw new BadRequestException("Ошибка оценкий !")
 		}
 	}
 }

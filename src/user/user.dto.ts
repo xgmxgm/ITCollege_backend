@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, IsUrl } from 'class-validator'
+import { IsEmail, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator'
 
 export class UserSignUpDto {
 	@IsString()
@@ -24,4 +24,29 @@ export class UserSignInDto {
 
 	@IsString()
 	Password: string;
+}
+
+export class UserScoreDto {
+	@IsNumber()
+	Id: number;
+
+	@IsNumber()
+	Score: number;
+}
+
+export class UserStageDto {
+	@IsNumber()
+	Id: number;
+
+	@IsNumber()
+	refereeScore_1: number;
+
+	@IsNumber()
+	refereeScore_2: number;
+
+	@IsNumber()
+	refereeScore_3: number;
+
+	@IsNumber()
+	refereeScore_4: number;
 }
